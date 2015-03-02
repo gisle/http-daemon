@@ -96,11 +96,13 @@ DESCRIPTION
     $c->get_request
     $c->get_request( $headers_only )
         This method reads data from the client and turns it into an
-        `HTTP::Request' object which is returned. It returns `undef' if
-        reading fails. If it fails, then the `HTTP::Daemon::ClientConn'
-        object ($c) should be discarded, and you should not try call this
-        method again on it. The $c->reason method might give you some
-        information about why $c->get_request failed.
+        `HTTP::Request' object which is returned. It returns a false, but
+        defined, value if it failed because of a read timeout; in this case,
+        repeated calls to $c->get_request may eventually succeed. It returns
+        undef it it fails because of another reason; in this case, the
+        `HTTP::Daemon::ClientConn' object ($c) should be discarded, and you
+        should not try call this method again on it. The $c->reason method
+        might give you some information about why $c->get_request failed.
 
         The get_request() method will normally not return until the whole
         request has been received from the client. This might not be what
@@ -119,7 +121,7 @@ DESCRIPTION
         buffer*. The next time $c->get_request is called it will consume the
         bytes in this buffer before reading more data from the network
         connection itself. The read buffer is invalid after $c->get_request
-        has failed.
+        has failed, except for time outs.
 
         If you handle the reading of the request content yourself you need
         to empty this buffer before you read more and you need to place
